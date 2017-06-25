@@ -26,8 +26,6 @@ public class Player {
     private boolean jumping = false;
     private float jumpTimer = 0;
 
-    private static final float JUMP_TIMOUT = 20f;
-
     private Animation currentAnimation, idleAnimation, walkingAnimation, fallingAnimation;
 
     public Player(Camera camera, Keyboard keyboard, Controller controller) {
