@@ -1,47 +1,42 @@
 package dragespillet;
 
 import org.newdawn.slick.Animation;
-import org.newdawn.slick.ControllerListener;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
-import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Rectangle;
 
-public class Player implements ControllerListener {
+public class Player {
 
-    public Position position;
+    public Position position = new Position(0f, 0f, 60, 60);
 
-    public float walkingSpeed;
-    public float jumpingSpeed;
-    public float fallingSpeed;
+    public float walkingSpeed = 2f;
+    public float jumpingSpeed = 6f;
+    public float fallingSpeed = 4f;
 
     private final Camera camera;
-    private final static int A_BUTTON = 1;
-    private boolean controller = false;
-    private boolean controller_left;
-    private boolean controller_right;
+    private final Controller controller;
+    private final Keyboard keyboard;
 
-    private boolean left;
-    private boolean right;
-    private boolean falling;
-    private boolean jumping;
+    private boolean left = false;
+    private boolean right = false;
+    private boolean falling = false;
+    private boolean jumping = false;
     private float jumpTimer = 0;
+
+    private static final float JUMP_TIMOUT = 20f;
 
     private Animation currentAnimation, idleAnimation, walkingAnimation, fallingAnimation;
 
-    public Player(Camera camera) {
-        this.position = new Position(0f, 0f, 60, 60);
-        this.walkingSpeed = 2f;
-        this.fallingSpeed = 4f;
-        this.jumpingSpeed = 6f;
+    public Player(Camera camera, Keyboard keyboard, Controller controller) {
         this.camera = camera;
+        this.controller = controller;
+        this.keyboard = keyboard;
     }
 
     void init(GameContainer gc) throws SlickException {
-        gc.getInput().addControllerListener(this);
         SpriteSheet sheet = new SpriteSheet("sprites/playersprites.gif", 30, 30);
         Image[] idle = new Image[]{
             sheet.getSubImage(0, 0),
@@ -69,15 +64,14 @@ public class Player implements ControllerListener {
     }
 
     public void update(GameContainer gc, int delta) {
-        if (gc.getInput().isKeyPressed(Input.KEY_C)) {
-            this.controller = true;
-        }
-        if (!jumping && gc.getInput().isKeyPressed(Input.KEY_SPACE)) {
-            this.jumping = true;
+        boolean wasJumping = this.jumping;
+        this.jumping = wasJumping || keyboard.isJumping() || this.controller.isJumping();
+        if (!wasJumping && jumping && this.jumpTimer == 0) {
             this.jumpTimer = 20f;
+            System.out.println("jumping");
         }
-        this.right = gc.getInput().isKeyDown(Input.KEY_RIGHT) || this.controller_right;
-        this.left = gc.getInput().isKeyDown(Input.KEY_LEFT) || this.controller_left;
+        this.right = keyboard.isRight() || this.controller.isRight();
+        this.left = keyboard.isLeft() || this.controller.isLeft();
         if (jumping || falling) {
             this.currentAnimation = this.fallingAnimation;
         } else if (right || left) {
@@ -128,70 +122,5 @@ public class Player implements ControllerListener {
     void render(Graphics g) {
         Rectangle rect = this.position.getRect();
         this.currentAnimation.getCurrentFrame().getFlippedCopy(this.left, false).draw(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
-    }
-
-    @Override
-    public void controllerLeftPressed(int controller) {
-        this.controller_left = true;
-    }
-
-    @Override
-    public void controllerLeftReleased(int controller) {
-        this.controller_left = false;
-    }
-
-    @Override
-    public void controllerRightPressed(int controller) {
-        this.controller_right = true;
-    }
-
-    @Override
-    public void controllerRightReleased(int controller) {
-        this.controller_right = false;
-    }
-
-    @Override
-    public void controllerUpPressed(int controller) {
-    }
-
-    @Override
-    public void controllerUpReleased(int controller) {
-    }
-
-    @Override
-    public void controllerDownPressed(int controller) {
-    }
-
-    @Override
-    public void controllerDownReleased(int controller) {
-    }
-
-    @Override
-    public void controllerButtonPressed(int controller, int button) {
-        if (!jumping && button == A_BUTTON) {
-            this.jumping = true;
-            this.jumpTimer = 20f;
-        }
-    }
-
-    @Override
-    public void controllerButtonReleased(int controller, int button) {
-    }
-
-    @Override
-    public void setInput(Input input) {
-    }
-
-    @Override
-    public boolean isAcceptingInput() {
-        return controller;
-    }
-
-    @Override
-    public void inputEnded() {
-    }
-
-    @Override
-    public void inputStarted() {
     }
 }

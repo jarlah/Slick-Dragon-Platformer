@@ -16,6 +16,8 @@ public class DrageSpillet extends BasicGame {
     private Camera camera;
     private Player player;
     private Image background;
+    private Controller controller;
+    private Keyboard keyboard;
 
     public DrageSpillet(String gamename) {
         super(gamename);
@@ -25,13 +27,18 @@ public class DrageSpillet extends BasicGame {
     public void init(GameContainer gc) throws SlickException {
         map = new TiledMap("maps/game.tmx", "maps");
         camera = new Camera(gc.getWidth(), gc.getHeight(), map);
-        player = new Player(camera);
+        controller = new Controller();
+        gc.getInput().addControllerListener(controller);
+        keyboard = new Keyboard();
+        player = new Player(camera, keyboard, controller);
         player.init(gc);
         background = new Image("textures/background.jpg");
     }
 
     @Override
     public void update(GameContainer gc, int i) throws SlickException {
+        keyboard.update(gc, i);
+        controller.update(gc, i);
         player.update(gc, i);
         camera.centerOn(player.position.getRect());
     }
