@@ -55,7 +55,6 @@ public class DrageSpillet extends BasicGame {
         try {
             AppGameContainer appgc;
             appgc = new AppGameContainer(new DrageSpillet("DrageSpillet"));
-            appgc.setVSync(true);
             appgc.setDisplayMode(1024, 768, false);
             appgc.start();
         } catch (SlickException ex) {

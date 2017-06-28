@@ -24,9 +24,11 @@ public class Player {
     private boolean right = false;
     private boolean falling = false;
     private boolean jumping = false;
-    private float jumpTimer = 0;
+    private int jumpTimer;
 
     private Animation currentAnimation, idleAnimation, walkingAnimation, fallingAnimation;
+    private Animation grabbingAnimation;
+    private boolean grabbing;
 
     public Player(Camera camera, Keyboard keyboard, Controller controller) {
         this.camera = camera;
@@ -57,23 +59,30 @@ public class Player {
             sheet.getSubImage(1, 3)
         };
         this.fallingAnimation = new Animation(fallingSequence, 200, false);
+        SpriteSheet sheetGrabbing = new SpriteSheet("sprites/playersprites.gif", 60, 30);
+        Image[] grabbingImgs = new Image[]{
+            sheetGrabbing.getSubImage(0, 6),
+            sheetGrabbing.getSubImage(1, 6),
+            sheetGrabbing.getSubImage(2, 6),
+            sheetGrabbing.getSubImage(3, 6),
+            sheetGrabbing.getSubImage(4, 6)
+        };
+        this.grabbingAnimation = new Animation(grabbingImgs, 70, false);
         this.currentAnimation = this.idleAnimation;
 
     }
 
     public void update(GameContainer gc, int delta) {
-        boolean wasJumping = this.jumping;
-        this.jumping = wasJumping || keyboard.isJumping() || this.controller.isJumping();
-        if (!wasJumping && jumping && this.jumpTimer == 0) {
-            this.jumpTimer = 20f;
-            System.out.println("jumping");
-        }
+        this.jumping = this.jumping || keyboard.isJumping() || this.controller.isJumping();
         this.right = keyboard.isRight() || this.controller.isRight();
         this.left = keyboard.isLeft() || this.controller.isLeft();
+        this.grabbing = keyboard.isGrabbing() || controller.isGrabbing();
         if (jumping || falling) {
             this.currentAnimation = this.fallingAnimation;
         } else if (right || left) {
             this.currentAnimation = this.walkingAnimation;
+        } else if (grabbing) {
+            this.currentAnimation =  this.grabbingAnimation;
         } else {
             this.currentAnimation = this.idleAnimation;
         }
@@ -95,17 +104,18 @@ public class Player {
                 newXPos = this.position.x;
             }
         }
-        if (this.jumping) {
+        if (this.jumping && this.jumpTimer <= 200) {
             newYPos -= this.jumpingSpeed * delta / 1000f;
+            System.out.println(String.format("delta: %s, timer: %s", delta, jumpTimer));
+            this.jumpTimer += delta;
             if (newYPos < 0 || this.camera.checkCollision(this.position.copy(newXPos, newYPos).getRect())) {
                 newYPos = this.position.y;
-                this.jumpTimer = 0;
-            } else {
-                this.jumpTimer--;
-            }
-            if (this.jumpTimer <= 0) {
                 this.jumping = false;
+                this.jumpTimer = 0;
             }
+        } else {
+            this.jumping = false;
+            this.jumpTimer = 0;
         }
         if (!this.jumping && !this.camera.checkCollision(this.position.copy(newXPos, newYPos + (this.fallingSpeed * delta / 1000f)).getRect())) {
             newYPos += this.fallingSpeed * delta / 1000f;
@@ -119,6 +129,7 @@ public class Player {
 
     void render(Graphics g) {
         Rectangle rect = this.position.getRect();
-        this.currentAnimation.getCurrentFrame().getFlippedCopy(this.left, false).draw(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+        final Image currentFrame = this.currentAnimation.getCurrentFrame();
+        currentFrame.getFlippedCopy(this.left, false).draw(rect.getX(), rect.getY(), currentFrame.getWidth() * 2, rect.getHeight());
     }
 }

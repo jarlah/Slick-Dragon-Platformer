@@ -15,6 +15,7 @@ public class Keyboard {
     private boolean up;
     private boolean down;
     private boolean jumping;
+    private boolean grabbing;
 
     public void update(GameContainer gc, int delta) {
         this.right = gc.getInput().isKeyDown(Input.KEY_RIGHT);
@@ -22,6 +23,7 @@ public class Keyboard {
         this.up = gc.getInput().isKeyDown(Input.KEY_UP);
         this.down = gc.getInput().isKeyDown(Input.KEY_DOWN);
         this.jumping = gc.getInput().isKeyPressed(Input.KEY_SPACE);
+        this.grabbing  = gc.getInput().isKeyDown(Input.KEY_R);
     }
 
     public boolean isRight() {
@@ -42,5 +44,12 @@ public class Keyboard {
 
     public boolean isJumping() {
         return jumping;
+    }
+
+    /**
+     * @return the grabbing
+     */
+    public boolean isGrabbing() {
+        return grabbing;
     }
 }

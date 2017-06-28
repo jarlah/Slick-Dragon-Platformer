@@ -7,11 +7,14 @@ import org.newdawn.slick.Input;
 public class Controller implements ControllerListener {
 
     private final static int A_BUTTON = 1;
+    private final static int X_BUTTON = 2;
+    
     private boolean active = false;
     private boolean left = false;
     private boolean right = false;
     private boolean jumping = false;
-
+    private boolean grabbing = false;
+    
     public void update(GameContainer gc, int delta) {
         if (gc.getInput().isKeyPressed(Input.KEY_C)) {
             this.active = true;
@@ -59,12 +62,18 @@ public class Controller implements ControllerListener {
         if (button == A_BUTTON) {
             this.jumping = true;
         }
+        if (button == X_BUTTON) {
+            this.grabbing = true;
+        }
     }
 
     @Override
     public void controllerButtonReleased(int controller, int button) {
         if (button == A_BUTTON) {
             this.jumping = false;
+        }
+        if (button == X_BUTTON) {
+            this.grabbing = false;
         }
     }
 
@@ -95,5 +104,9 @@ public class Controller implements ControllerListener {
 
     public boolean isJumping() {
         return jumping;
+    }
+
+    public boolean isGrabbing() {
+        return grabbing;
     }
 }
