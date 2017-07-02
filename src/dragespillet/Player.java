@@ -12,9 +12,9 @@ public class Player {
 
     public Position position = new Position(0f, 0f, 60, 60);
 
-    public float walkingSpeed = 2f;
-    public float jumpingSpeed = 6f;
-    public float fallingSpeed = 4f;
+    public float walkingSpeed = 0.002f;
+    public float jumpingSpeed = 0.003f;
+    public float fallingSpeed = 0.003f;
 
     private final Camera camera;
     private final Controller controller;
@@ -93,19 +93,19 @@ public class Player {
     public void checkCollision(int delta) {
         float newXPos = this.position.x, newYPos = this.position.y;
         if (this.right) {
-            newXPos += this.walkingSpeed * delta / 1000f;
+            newXPos += this.walkingSpeed * delta;
             if (newXPos > this.camera.mapWidth || this.camera.checkCollision(this.position.copy(newXPos, newYPos).getRect())) {
                 newXPos = this.position.x;
             }
         }
         if (this.left) {
-            newXPos -= this.walkingSpeed * delta / 1000f;
+            newXPos -= this.walkingSpeed * delta;
             if (newXPos < 0 || this.camera.checkCollision(this.position.copy(newXPos, newYPos).getRect())) {
                 newXPos = this.position.x;
             }
         }
-        if (this.jumping && this.jumpTimer <= 200) {
-            newYPos -= this.jumpingSpeed * delta / 1000f;
+        if (this.jumping && this.jumpTimer <= 400) {
+            newYPos -= this.jumpingSpeed * delta;
             System.out.println(String.format("delta: %s, timer: %s", delta, jumpTimer));
             this.jumpTimer += delta;
             if (newYPos < 0 || this.camera.checkCollision(this.position.copy(newXPos, newYPos).getRect())) {
@@ -117,8 +117,8 @@ public class Player {
             this.jumping = false;
             this.jumpTimer = 0;
         }
-        if (!this.jumping && !this.camera.checkCollision(this.position.copy(newXPos, newYPos + (this.fallingSpeed * delta / 1000f)).getRect())) {
-            newYPos += this.fallingSpeed * delta / 1000f;
+        if (!this.jumping && !this.camera.checkCollision(this.position.copy(newXPos, newYPos + (this.fallingSpeed * delta)).getRect())) {
+            newYPos += this.fallingSpeed * delta;
             this.falling = true;
         } else {
             this.falling = false;
