@@ -37,7 +37,8 @@ public class Player {
     }
 
     void init(GameContainer gc) throws SlickException {
-        SpriteSheet sheet = new SpriteSheet("sprites/playersprites.gif", 30, 30);
+        Image sprites = new Image("sprites/playersprites.gif");
+        SpriteSheet sheet = new SpriteSheet(sprites, 30, 30);
         Image[] idle = new Image[]{
             sheet.getSubImage(0, 0),
             sheet.getSubImage(1, 0)
@@ -59,7 +60,7 @@ public class Player {
             sheet.getSubImage(1, 3)
         };
         this.fallingAnimation = new Animation(fallingSequence, 200, false);
-        SpriteSheet sheetGrabbing = new SpriteSheet("sprites/playersprites.gif", 60, 30);
+        SpriteSheet sheetGrabbing = new SpriteSheet(sprites, 60, 30);
         Image[] grabbingImgs = new Image[]{
             sheetGrabbing.getSubImage(0, 6),
             sheetGrabbing.getSubImage(1, 6),
@@ -69,7 +70,6 @@ public class Player {
         };
         this.grabbingAnimation = new Animation(grabbingImgs, 70, false);
         this.currentAnimation = this.idleAnimation;
-
     }
 
     public void update(GameContainer gc, int delta) {
@@ -106,7 +106,6 @@ public class Player {
         }
         if (this.jumping && this.jumpTimer <= 400) {
             newYPos -= this.jumpingSpeed * delta;
-            System.out.println(String.format("delta: %s, timer: %s", delta, jumpTimer));
             this.jumpTimer += delta;
             if (newYPos < 0 || this.camera.checkCollision(this.position.copy(newXPos, newYPos).getRect())) {
                 newYPos = this.position.y;
